@@ -1,9 +1,8 @@
 from typing import Callable
 
 import yaml
-from fastapi import Body, FastAPI, Request, Response
+from fastapi import Request, Response
 from fastapi.routing import APIRoute
-from pydantic import BaseModel, Extra
 
 
 class YamlRequest(Request):

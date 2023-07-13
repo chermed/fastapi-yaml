@@ -38,7 +38,13 @@ curl --request POST \
   --data "name: John Doe\nage: 42"
 ```
 
-# Coverage
+# Tests
+
+```bash
+poetry run pytest --cov fastapi_yaml tests/
+```
+
+## Coverage
 
 ```text
 ---------- coverage: platform darwin, python 3.11.2-final-0 ----------

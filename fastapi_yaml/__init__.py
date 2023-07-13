@@ -1,1 +1,1 @@
-from .main import YamlRequest, YamlRoute
+from .main import YamlRequest, YamlRoute  # noqa

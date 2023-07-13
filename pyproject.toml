@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-yaml"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Mohamed Cherkaoui <chermed@gmail.com>"]
 readme = "README.md"
