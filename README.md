@@ -1,6 +1,8 @@
 # Overview
 
 Handle YAML requests with FastAPI.
+The package will do the best effort to convert the YAML request to JSON.
+All files that are uploaded as multipart/form-data will be concatenated and converted to JSON if the header `handle-as-yaml` is set to true.
 
 # Installation
 

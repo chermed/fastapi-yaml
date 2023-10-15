@@ -5,6 +5,14 @@ from fastapi import Request, Response
 from fastapi.routing import APIRoute
 
 
+def to_bool(s: str | bool | None) -> bool:
+    if not s:
+        return False
+    if isinstance(s, bool):
+        return s
+    return s.lower().strip() in ["enable", "true", "yes", "1", "t", "y"]
+
+
 class YamlRequest(Request):
     async def body(self) -> bytes:
         if not hasattr(self, "_body"):
@@ -15,6 +23,17 @@ class YamlRequest(Request):
                 "text/yaml",
             ]:
                 body = yaml.safe_load(body)
+            elif self.headers.get("content-type").startswith(
+                "multipart/form-data"
+            ) and to_bool(self.headers.get("handle-as-yaml")):
+                form = await self.form()
+                contents = ""
+                for file in form.values():
+                    file_content = await file.read()
+                    if isinstance(file_content, bytes):
+                        file_content = file_content.decode()
+                    contents += file_content + "\n"
+                body = yaml.safe_load(contents)
             self._body = body
         return self._body
 

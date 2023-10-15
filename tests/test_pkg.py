@@ -1,3 +1,4 @@
+
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
@@ -11,6 +12,7 @@ app.router.route_class = YamlRoute
 class Person(BaseModel, extra="forbid"):
     name: str
     age: int
+    address: str = None
 
 
 @app.post("/person")
@@ -55,3 +57,44 @@ def test_extra_yaml_param():
     )
     assert response.status_code == 422
     assert response.json()["detail"][0]["msg"] == "Extra inputs are not permitted"
+
+
+def test_read_file_with_header_1():
+    response = client.post(
+        "/person",
+        files=[
+            ("upload_file", open("tests/files/person.yaml", "rb")),
+            ("file_ext", open("tests/files/person_address.yaml", "rb")),
+            ],
+        headers={"handle-as-yaml": "enable"},
+    )
+    assert response.status_code == 200
+    assert response.json()["person"]["name"] == "John Doe"
+    assert response.json()["person"]["age"] == 30
+    assert response.json()["person"]["address"] == "123 Main St"
+
+
+def test_read_file_with_header_2():
+    response = client.post(
+        "/person",
+        files=[
+            ("upload_file", open("tests/files/person.yaml", "rb")),
+            ("file_ext", open("tests/files/person_address.yaml", "rb")),
+            ],
+        headers={"HANDLE-AS-YAML": "True"},
+    )
+    assert response.status_code == 200
+    assert response.json()["person"]["name"] == "John Doe"
+    assert response.json()["person"]["age"] == 30
+    assert response.json()["person"]["address"] == "123 Main St"
+
+def test_read_file_errors():
+    response = client.post(
+        "/person",
+        files=[
+            ("upload_file", open("tests/files/person.yaml", "rb")),
+            ("file_ext", open("tests/files/person_address.yaml", "rb")),
+            ],
+        headers={"handle-as-yaml": "false"},
+    )
+    assert response.status_code == 422
