@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
@@ -73,7 +72,6 @@ def test_read_file_with_header_1():
     assert response.json()["person"]["age"] == 30
     assert response.json()["person"]["address"] == "123 Main St"
 
-
 def test_read_file_with_header_2():
     response = client.post(
         "/person",
@@ -98,3 +96,23 @@ def test_read_file_errors():
         headers={"handle-as-yaml": "false"},
     )
     assert response.status_code == 422
+
+
+def test_read_file_using_boundaries():
+    body = """
+     ------WebKitFormBoundary7MA4YWxkTrZu0gW
+    Content-Disposition: form-data; name="file"; filename="test.yaml"
+    Content-Type: application/x-yaml
+
+    name: Foo\nage: 30
+    ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+    """
+    response = client.post(
+        "/person",
+        data=body.strip(),
+        headers={
+            "Content-Type": "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
+            # "handle-as-yaml": "enable",
+        },
+    )
+    assert response.status_code == 200

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-yaml"
-version = "0.2.0"
+version = "0.3.0-rc"
 description = "Handle YAML data in FastAPI"
 authors = ["Mohamed Cherkaoui <chermed@gmail.com>"]
 readme = "README.md"

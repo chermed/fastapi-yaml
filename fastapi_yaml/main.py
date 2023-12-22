@@ -44,6 +44,24 @@ class YamlRoute(APIRoute):
 
         async def custom_route_handler(request: Request) -> Response:
             request = YamlRequest(request.scope, request.receive)
+            content_type = request.headers.get("content-type", "").strip()
+            if content_type.startswith("multipart/form-data"):
+                body_bytes = await request.body()
+                if isinstance(body_bytes, bytes) and b"\r\n" not in body_bytes:
+                    modified_body = body_bytes.replace(b"\n", b"\r\n")
+                    original_receive = request.receive
+
+                    async def custom_receive():
+                        if modified_body:
+                            return {
+                                "type": "http.request",
+                                "body": modified_body,
+                                "more_body": False,
+                            }
+                        else:
+                            return await original_receive()
+
+                    request = Request(request.scope, custom_receive)
             return await original_route_handler(request)
 
         return custom_route_handler
